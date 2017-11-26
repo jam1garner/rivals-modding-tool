@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Security.Principal;
+using Microsoft.Win32;
 
 namespace RivalsModdingTool
 {
@@ -81,7 +83,36 @@ namespace RivalsModdingTool
         byte[] exe = null;
         Offsets offsets = null;
 
-        void updateOffsets()
+        private void FixRegistry()
+        {
+            var identity = WindowsIdentity.GetCurrent();
+            var principal = new WindowsPrincipal(identity);
+
+            if (principal.IsInRole(WindowsBuiltInRole.Administrator))
+            {
+                var customProtocol = Registry.ClassesRoot.OpenSubKey("roamod\\shell\\open\\command", true);
+                if (customProtocol == null)
+                {
+                    Registry.ClassesRoot.CreateSubKey("roamod\\shell\\open\\command");
+                    customProtocol = Registry.ClassesRoot.OpenSubKey("roamod\\shell\\open\\command", true);
+                    if (customProtocol == null)
+                    {
+                        MessageBox.Show("Failed to register url service.");
+                        return;
+                    }
+                }
+                Console.WriteLine($"\"{System.Reflection.Assembly.GetEntryAssembly().Location}\" \"%1\"");
+                customProtocol.SetValue("", $"\"{System.Reflection.Assembly.GetEntryAssembly().Location}\" \"%1\"", RegistryValueKind.String);
+                customProtocol.Close();
+            }
+            else
+            {
+                MessageBox.Show("You must launch as admin to set up mod installing.");
+            }
+
+        }
+
+        private void updateOffsets()
         {
             
             if(exe == null)
@@ -130,7 +161,7 @@ namespace RivalsModdingTool
             File.WriteAllText("offsets.txt", f);
         }
 
-        void verifyOffsets()
+        private void verifyOffsets()
         {
             if (!File.Exists("RivalsofAether.exe") || offsets != null)
                 return;
@@ -227,7 +258,7 @@ namespace RivalsModdingTool
                     continue;
                 exeFile.BaseStream.Seek(i.Item1, SeekOrigin.Begin);
                 byte[] pngFile = File.ReadAllBytes($"sprites/RIP_{j}.png");
-                if (pngFile.Length >= (i.Item2 + pngFooter.Length) - i.Item1)
+                if (pngFile.Length > i.Item2 - i.Item1)
                 {
                     MessageBox.Show($"WARNING: RIP_{j}.png is too large, compress to reduce file size");
                     continue;
@@ -245,14 +276,14 @@ namespace RivalsModdingTool
 
             BinaryWriter exeFile = new BinaryWriter(new FileStream("RivalsofAether.exe", FileMode.Open));
             int j = 0;
-            foreach (var i in offsets.pngOffsets)
+            foreach (var i in offsets.wavOffsets)
             {
                 j++;
                 if (!File.Exists($"audio/RIP_{j}.wav"))
                     continue;
                 exeFile.BaseStream.Seek(i.Item1, SeekOrigin.Begin);
                 byte[] wavFile = File.ReadAllBytes($"audio/RIP_{j}.wav");
-                if (wavFile.Length >= i.Item2 - i.Item1)
+                if (wavFile.Length > i.Item2 - i.Item1)
                 {
                     MessageBox.Show($"WARNING: RIP_{j}.wav is too large, compress to reduce file size");
                     continue;
@@ -265,6 +296,11 @@ namespace RivalsModdingTool
         private void browseMods_Click(object sender, EventArgs e)
         {
             System.Diagnostics.Process.Start("https://gamebanana.com/games/5750");
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            FixRegistry();
         }
     }
 

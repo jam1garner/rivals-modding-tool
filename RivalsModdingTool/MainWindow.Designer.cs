@@ -35,6 +35,7 @@
             this.replaceAudio = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.browse_mods = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // ripSprites
@@ -145,6 +146,17 @@
             this.browse_mods.MouseDown += new System.Windows.Forms.MouseEventHandler(this.browseMods_MouseDown);
             this.browse_mods.MouseUp += new System.Windows.Forms.MouseEventHandler(this.browseMods_MouseUp);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(465, 72);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(136, 23);
+            this.button1.TabIndex = 6;
+            this.button1.Text = "Setup Mod Installation";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Visible = false;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -153,6 +165,7 @@
             this.BackgroundImage = global::RivalsModdingTool.Properties.Resources.bg_piece;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(644, 365);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.browse_mods);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.replaceAudio);
@@ -180,6 +193,7 @@
         private System.Windows.Forms.Button replaceAudio;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button browse_mods;
+        private System.Windows.Forms.Button button1;
     }
 }
 
