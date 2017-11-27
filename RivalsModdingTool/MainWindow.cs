@@ -8,8 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.IO.Compression;
 using System.Security.Principal;
 using Microsoft.Win32;
+using System.Net;
+using System.Text.RegularExpressions;
 
 namespace RivalsModdingTool
 {
@@ -19,6 +22,8 @@ namespace RivalsModdingTool
         {
             InitializeComponent();
         }
+
+        public string[] toInstall = null;
 
         private void ripSprites_MouseDown(object sender, MouseEventArgs e)
         {
@@ -110,6 +115,97 @@ namespace RivalsModdingTool
                 MessageBox.Show("You must launch as admin to set up mod installing.");
             }
 
+        }
+
+        private bool fullMatch(string s)
+        {
+            foreach (Capture c in Regex.Match(s, "(.*(\\/|\\\\))?(RIP_[0-9]+(.png|.wav))|(.*(\\/|\\\\))?(music_.*\\.ogg)").Captures)
+                if (c.Length == s.Length)
+                    return true;
+            return false;
+        }
+
+        private void zipInstall(string zipPath)
+        {
+            ZipArchive z = ZipFile.Open(zipPath, ZipArchiveMode.Read);
+            foreach (var f in z.Entries)
+            {
+                if (fullMatch(f.FullName))
+                {
+                    string[] split = f.FullName.Split('/', '\\');
+                    string localName = split[split.Length - 1];
+                    if (localName.EndsWith(".png"))
+                    {
+                        if (!Directory.Exists("sprites"))
+                            Directory.CreateDirectory("sprites");
+                        f.ExtractToFile($"sprites/{localName}");
+                    }
+                    else if (localName.EndsWith(".wav"))
+                    {
+                        if (!Directory.Exists("audio"))
+                            Directory.CreateDirectory("audio");
+                        f.ExtractToFile($"audio/{localName}");
+                    }
+                    else if (localName.EndsWith(".ogg"))
+                    {
+                        f.ExtractToFile(localName);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Attempts to setup files for install
+        /// </summary>
+        /// <param name="installPath"></param>
+        /// <returns>Whether or not install was successful (whether or not to replace sprites/sounds)</returns>
+        private bool install(string installPath)
+        {
+            try
+            {
+                try
+                {
+                    installPath = Path.GetFullPath(installPath);
+                }
+                catch { /*If you're reading this please don't hate me*/ }
+                    
+                if (new Uri(installPath).IsFile)
+                {
+                    if (File.Exists(installPath))
+                    {
+                        if(Path.GetExtension(installPath) == ".zip")
+                        {
+                            zipInstall(installPath);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Error: File '{installPath}' does not exist");
+                        return false;
+                    }
+                }
+                else
+                {
+                    byte[] file = new WebClient().DownloadData(installPath);
+                    string tempFilePath = Path.GetTempFileName();
+                    File.WriteAllBytes(tempFilePath, file);
+                    try
+                    {
+                        zipInstall(tempFilePath);
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Error: Only zip file install is supported for online install");
+                        return false;
+                    }
+                }
+                return true;
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show("Install Failed, Error:\n" + e.Message);
+                return false;
+            }
         }
 
         private void updateOffsets()
@@ -209,7 +305,7 @@ namespace RivalsModdingTool
             }
         }
 
-        private void ripSprites_Click(object sender, EventArgs e)
+        private void ripSprites_Click(object sender = null, EventArgs e = null)
         {
             verifyOffsets();
             if (!Directory.Exists("sprites/"))
@@ -226,7 +322,7 @@ namespace RivalsModdingTool
             exeFile.Close();
         }
 
-        private void ripAudio_Click(object sender, EventArgs e)
+        private void ripAudio_Click(object sender = null, EventArgs e = null)
         {
             verifyOffsets();
             if (!Directory.Exists("audio/"))
@@ -243,7 +339,7 @@ namespace RivalsModdingTool
             exeFile.Close();
         }
 
-        private void replaceSprites_Click(object sender, EventArgs e)
+        private void replaceSprites_Click(object sender = null, EventArgs e = null)
         {
             if (!Directory.Exists("sprites/"))
                 return;
@@ -268,7 +364,7 @@ namespace RivalsModdingTool
             exeFile.Close();
         }
 
-        private void replaceAudio_Click(object sender, EventArgs e)
+        private void replaceAudio_Click(object sender = null, EventArgs e = null)
         {
             if (!Directory.Exists("audio/"))
                 return;
@@ -301,6 +397,19 @@ namespace RivalsModdingTool
         private void button1_Click(object sender, EventArgs e)
         {
             FixRegistry();
+        }
+
+        private void MainWindow_Load(object sender, EventArgs e)
+        {
+            bool j = true;
+            if(toInstall != null)
+                foreach (string path in toInstall)
+                    j &= install(path);
+            if(j && toInstall != null && toInstall.Length > 0)
+            {
+                replaceSprites_Click();
+                replaceAudio_Click();
+            }
         }
     }
 

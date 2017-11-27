@@ -154,7 +154,6 @@
             this.button1.TabIndex = 6;
             this.button1.Text = "Setup Mod Installation";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Visible = false;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // MainWindow
@@ -180,6 +179,7 @@
             this.MinimumSize = new System.Drawing.Size(660, 404);
             this.Name = "MainWindow";
             this.Text = "Rivals Modding Tool 2.0";
+            this.Load += new System.EventHandler(this.MainWindow_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
