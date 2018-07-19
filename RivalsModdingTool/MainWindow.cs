@@ -267,7 +267,8 @@ namespace RivalsModdingTool
                 if(offsets == null)
                 {
                     List<string> lines = File.ReadAllLines("offsets.txt").ToList();
-                    lines.Add("-"); //Safety for if there is no end to png section
+                    if(lines.IndexOf("-") < 0)
+                        lines.Add("-"); //Safety for if there is no end to png section
                     IEnumerable<string> pngLines = lines.Take(lines.IndexOf("-")).ToArray();
                     IEnumerable<string> wavLines = lines.Skip(lines.IndexOf("-") + 1).Take(lines.IndexOf("-")).ToArray();
 
