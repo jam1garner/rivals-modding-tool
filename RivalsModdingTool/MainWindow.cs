@@ -13,6 +13,8 @@ using System.Security.Principal;
 using Microsoft.Win32;
 using System.Net;
 using System.Text.RegularExpressions;
+using GameMaker2;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace RivalsModdingTool
 {
@@ -415,12 +417,69 @@ namespace RivalsModdingTool
 
         private void extractAudioGroup_Click(object sender, EventArgs e)
         {
-
+            OpenFileDialog fileDialog = new OpenFileDialog();
+            fileDialog.Filter = "dat files (*.dat)|*.dat|All files (*.*)|*.*";
+            fileDialog.Title = "Select Audio Group File";
+            if(fileDialog.ShowDialog() == DialogResult.OK)
+            {
+                AudioGroup audioGroup = new AudioGroup(fileDialog.FileName);
+                CommonOpenFileDialog folderDialog = new CommonOpenFileDialog();
+                folderDialog.InitialDirectory = Path.GetDirectoryName(fileDialog.FileName);
+                folderDialog.IsFolderPicker = true;
+                if (folderDialog.ShowDialog() == CommonFileDialogResult.Ok)
+                {
+                    if (!Directory.Exists(folderDialog.FileName))
+                        Directory.CreateDirectory(folderDialog.FileName);
+                    for (int i = 0; i < audioGroup.files.Count; i++)
+                    {
+                        string magic = Encoding.Default.GetString(audioGroup.files[i], 0, 4);
+                        if(magic == "RIFF")
+                            File.WriteAllBytes(Path.Combine(folderDialog.FileName, $"{i}.wav"), audioGroup.files[i]);
+                        else if(magic == "OggS")
+                            File.WriteAllBytes(Path.Combine(folderDialog.FileName, $"{i}.ogg"), audioGroup.files[i]);
+                        else
+                            File.WriteAllBytes(Path.Combine(folderDialog.FileName, i.ToString()), audioGroup.files[i]);
+                    }
+                }
+            }
         }
 
         private void packAudioGroup_Click(object sender, EventArgs e)
         {
-
+            AudioGroup newAudioGroup = new AudioGroup();
+            CommonOpenFileDialog folderDialog = new CommonOpenFileDialog();
+            folderDialog.IsFolderPicker = true;
+            if (folderDialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                if (!Directory.Exists(folderDialog.FileName))
+                    Directory.CreateDirectory(folderDialog.FileName);
+                for(int i = 0; true; i++)
+                {
+                    if(File.Exists(Path.Combine(folderDialog.FileName, $"{i}.wav")))
+                    {
+                        newAudioGroup.files.Add(File.ReadAllBytes(Path.Combine(folderDialog.FileName, $"{i}.wav")));
+                    }
+                    else if(File.Exists(Path.Combine(folderDialog.FileName, $"{i}.ogg")))
+                    {
+                        newAudioGroup.files.Add(File.ReadAllBytes(Path.Combine(folderDialog.FileName, $"{i}.ogg")));
+                    }
+                    else if(File.Exists(Path.Combine(folderDialog.FileName, $"{i}")))
+                    {
+                        newAudioGroup.files.Add(File.ReadAllBytes(Path.Combine(folderDialog.FileName, $"{i}")));
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                SaveFileDialog fileDialog = new SaveFileDialog();
+                fileDialog.Filter = "dat files (*.dat)|*.dat|All files (*.*)|*.*";
+                fileDialog.Title = "Save Audio Group File";
+                if(fileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    newAudioGroup.Write(fileDialog.FileName);
+                }
+            }
         }
     }
 

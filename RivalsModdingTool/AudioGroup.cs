@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RivalsModdingTool
+namespace GameMaker2
 {
     class AudioGroup
     {
-        List<byte[]> files = new List<byte[]>();
+        public List<byte[]> files = new List<byte[]>();
 
         public AudioGroup() { }
         
