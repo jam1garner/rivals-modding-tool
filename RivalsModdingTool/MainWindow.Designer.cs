@@ -36,6 +36,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.browse_mods = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this.extractAudioGroup = new System.Windows.Forms.Button();
+            this.packAudioGroup = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // ripSprites
@@ -156,6 +158,26 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // extractAudioGroup
+            // 
+            this.extractAudioGroup.Location = new System.Drawing.Point(12, 330);
+            this.extractAudioGroup.Name = "extractAudioGroup";
+            this.extractAudioGroup.Size = new System.Drawing.Size(143, 23);
+            this.extractAudioGroup.TabIndex = 7;
+            this.extractAudioGroup.Text = "Extract Audio Group";
+            this.extractAudioGroup.UseVisualStyleBackColor = true;
+            this.extractAudioGroup.Click += new System.EventHandler(this.extractAudioGroup_Click);
+            // 
+            // packAudioGroup
+            // 
+            this.packAudioGroup.Location = new System.Drawing.Point(161, 330);
+            this.packAudioGroup.Name = "packAudioGroup";
+            this.packAudioGroup.Size = new System.Drawing.Size(143, 23);
+            this.packAudioGroup.TabIndex = 8;
+            this.packAudioGroup.Text = "Pack Audio Group";
+            this.packAudioGroup.UseVisualStyleBackColor = true;
+            this.packAudioGroup.Click += new System.EventHandler(this.packAudioGroup_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -164,6 +186,8 @@
             this.BackgroundImage = global::RivalsModdingTool.Properties.Resources.bg_piece;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(644, 365);
+            this.Controls.Add(this.packAudioGroup);
+            this.Controls.Add(this.extractAudioGroup);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.browse_mods);
             this.Controls.Add(this.label1);
@@ -194,6 +218,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button browse_mods;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button extractAudioGroup;
+        private System.Windows.Forms.Button packAudioGroup;
     }
 }
 

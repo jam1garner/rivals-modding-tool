@@ -412,6 +412,16 @@ namespace RivalsModdingTool
                 replaceAudio_Click();
             }
         }
+
+        private void extractAudioGroup_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void packAudioGroup_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 
     static class ByteArraySearch
