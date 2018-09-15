@@ -202,7 +202,7 @@
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(660, 404);
             this.Name = "MainWindow";
-            this.Text = "Rivals Modding Tool 2.0";
+            this.Text = "Rivals Modding Tool 2.2";
             this.Load += new System.EventHandler(this.MainWindow_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
